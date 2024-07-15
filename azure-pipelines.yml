@@ -35,6 +35,9 @@ stages:
         ssh-keygen -t ed25519 -C "$(emailvar)" -f ~/.ssh/$(clusternamevar) -N $(clusternamevar)
         # Start the ssh-agent in the background
         eval "$(ssh-agent -s)"
+        echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> ~/.ssh/environment
+        echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> ~/.ssh/environment
+        source ~/.ssh/environment
         # Create the expect script
         cat << 'EOF' > add_ssh_key.exp
         #!/usr/bin/expect -f
