@@ -55,6 +55,8 @@ stages:
 
         # Clean up the expect script
         rm add_ssh_key.exp
+        eval "$(ssh-agent -s)"
+        ssh-add -l
       displayName: 'Generate SSH keys'
 
     - script: |
