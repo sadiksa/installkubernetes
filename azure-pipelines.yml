@@ -57,6 +57,7 @@ stages:
 
     - script: |
         echo $(vmprivatekey) >> vm_private_key
+        ls -al
         chmod 600 vm_private_key
         # It is required that your private key files are NOT accessible by others.
         ips=($(ipsvar))
