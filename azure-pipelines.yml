@@ -22,9 +22,9 @@ stages:
       displayName: 'Install dependencies'
 
     - script: |
-        ssh-keygen -t ed25519 -C "$emailvar" -f ~/.ssh/$clusternamevar -N $clusternamevar
+        ssh-keygen -t ed25519 -C "$emailvar" -f ~/.ssh/$(clusternamevar) -N $(clusternamevar)
         eval "$(ssh-agent -s)"
-        ssh-add ~/.ssh/$clusternamevar
+        ssh-add ~/.ssh/$(clusternamevar)
       displayName: 'Generate SSH keys'
 
     - script: |
