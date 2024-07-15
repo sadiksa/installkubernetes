@@ -138,6 +138,6 @@ stages:
         ssh-add -l
         cd kubespray
         source venv/bin/activate
-        ansible-playbook -i inventory/$(clusternamevar)/hosts.yaml --become --become-user=root cluster.yml
+        sudo ansible-playbook -i inventory/$(clusternamevar)/hosts.yaml --become --become-user=root cluster.yml
       displayName: 'Deploy Kubernetes with Kubespray'
 
