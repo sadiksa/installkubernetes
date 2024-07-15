@@ -32,6 +32,7 @@ stages:
       displayName: 'Install dependencies'
 
     - script: |
+        rm ~/.ssh/$(clusternamevar)
         ssh-keygen -t ed25519 -C "$emailvar" -f ~/.ssh/$(clusternamevar) -N $(clusternamevar)
         # Start the ssh-agent in the background
         eval "$(ssh-agent -s)"
