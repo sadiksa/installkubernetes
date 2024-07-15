@@ -13,7 +13,7 @@ RebWo/qstk4Bxa2MAA5WlBuASRaBAAAAoOvxHldQBjD3XviXqD30o9tA+wWRltUTuo74lL
 7AIT5he5RAPj96Ma6rRrwgXpWg4E+lMN5NzRpUmfnr3HAdmt0Nvkq/vKOKOIPZNya4pZ58
 u91r9hbNeMWWNBaA47PRRXk2oXySHGjRa8wg8=
 -----END OPENSSH PRIVATE KEY-----'
-  vmpassphrase: digitalocean
+  vmpassphrase: 'digitalocean'
 
 stages:
 - stage: DeployKubernetes
