@@ -19,12 +19,33 @@ stages:
         sudo apt install -y software-properties-common
         sudo add-apt-repository --yes --update ppa:ansible/ansible
         sudo apt install -y ansible git python3-pip python3-venv
+        sudo apt install expect
       displayName: 'Install dependencies'
 
     - script: |
         ssh-keygen -t ed25519 -C "$emailvar" -f ~/.ssh/$(clusternamevar) -N $(clusternamevar)
+        # Start the ssh-agent in the background
         eval "$(ssh-agent -s)"
-        ssh-add ~/.ssh/$(clusternamevar)
+        # Create the expect script
+        cat << 'EOF' > add_ssh_key.exp
+        #!/usr/bin/expect -f
+        set timeout -1
+        set key_path [lindex $argv 0]
+        set passphrase [lindex $argv 1]
+        spawn ssh-add $key_path
+        expect "Enter passphrase for"
+        send "$passphrase\r"
+        expect eof
+        EOF
+
+        # Make the script executable
+        chmod +x add_ssh_key.exp
+
+        # Run the expect script with the SSH key and passphrase
+        ./add_ssh_key.exp ~/.ssh/$(clusternamevar) "$(clusternamevar)"
+
+        # Clean up the expect script
+        rm add_ssh_key.exp
       displayName: 'Generate SSH keys'
 
     - script: |
