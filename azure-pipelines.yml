@@ -12,8 +12,8 @@ RebWo/qstk4Bxa2MAA5WlBuASRaBAAAAoOvxHldQBjD3XviXqD30o9tA+wWRltUTuo74lL
 8XWCG6hRhlTy3286jVIeJOQf0gC1/hiCnUbvQ1N669zuk/cBVGMc8V6ASkJZprtzzX7Zrh
 7AIT5he5RAPj96Ma6rRrwgXpWg4E+lMN5NzRpUmfnr3HAdmt0Nvkq/vKOKOIPZNya4pZ58
 u91r9hbNeMWWNBaA47PRRXk2oXySHGjRa8wg8=
------END OPENSSH PRIVATE KEY-----
-'
+-----END OPENSSH PRIVATE KEY-----'
+  vmpassphrase: digitalocean
 
 stages:
 - stage: DeployKubernetes
@@ -30,7 +30,7 @@ stages:
 
     - script: |
         rm ~/.ssh/$(clusternamevar)
-        ssh-keygen -t ed25519 -C "$emailvar" -f ~/.ssh/$(clusternamevar) -N $(clusternamevar)
+        ssh-keygen -t ed25519 -C "$(emailvar)" -f ~/.ssh/$(clusternamevar) -N $(clusternamevar)
         # Start the ssh-agent in the background
         eval "$(ssh-agent -s)"
         # Create the expect script
@@ -78,7 +78,7 @@ stages:
 
         for ip in "${ips[@]}"; do
           # ssh-copy-id -f -i ~/.ssh/$(clusternamevar).pub -o "IdentityFile ./vm_private_key" root@$ip
-          ./ssh_copy_id.exp "$(clusternamevar)" $ip
+          ./ssh_copy_id.exp "$(vmpassphrase)" $ip
         done
         rm vm_private_key
       displayName: 'Set up SSH access for all nodes'
