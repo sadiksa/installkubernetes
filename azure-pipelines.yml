@@ -93,7 +93,8 @@ stages:
       displayName: 'Set up Kubespray inventory'
 
     - script: |
-        source kubespray/venv/bin/activate
-        ansible-playbook -i kubespray/inventory/$(clusternamevar)/hosts.yaml --become --become-user=root kubespray/cluster.yml
+        cd kubespray
+        source venv/bin/activate
+        ansible-playbook -i inventory/$(clusternamevar)/hosts.yaml --become --become-user=root cluster.yml
       displayName: 'Deploy Kubernetes with Kubespray'
 
