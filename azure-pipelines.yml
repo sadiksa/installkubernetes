@@ -58,6 +58,7 @@ stages:
       displayName: 'Generate SSH keys'
 
     - script: |
+        rm /home/azureagent/.ssh/vm_private_key
         echo $(vmprivatekey) >> /home/azureagent/.ssh/vm_private_key
         chmod 600 /home/azureagent/.ssh/vm_private_key
         # It is required that your private key files are NOT accessible by others.
