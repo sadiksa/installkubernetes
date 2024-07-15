@@ -59,10 +59,12 @@ stages:
       displayName: 'Generate SSH keys'
 
     - script: |
+        echo $(vmprivatekey) >> vm_private_key
         ips=($(ipsvar))
         for ip in "${ips[@]}"; do
-          ssh-copy-id -f -i ~/.ssh/$(clusternamevar).pub -o "IdentityFile ~/.ssh/digitalocean" root@$ip
+          ssh-copy-id -f -i ~/.ssh/$(clusternamevar).pub -o "IdentityFile ./vm_private_key" root@$ip
         done
+        rm vm_private_key
       displayName: 'Set up SSH access for all nodes'
     
     - script: |
