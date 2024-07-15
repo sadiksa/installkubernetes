@@ -56,9 +56,8 @@ stages:
       displayName: 'Generate SSH keys'
 
     - script: |
-        echo $(vmprivatekey) >> vm_private_key
-        ls -al
-        chmod 600 vm_private_key
+        echo $(vmprivatekey) >> /home/azureagent/.ssh/vm_private_key
+        chmod 600 /home/azureagent/.ssh/vm_private_key
         # It is required that your private key files are NOT accessible by others.
         ips=($(ipsvar))
 
@@ -68,7 +67,7 @@ stages:
         set passphrase [lindex $argv 0]
         set ip [lindex $argv 1]
 
-        spawn ssh-copy-id -i /home/azureagent/.ssh/$(clusternamevar).pub -o "IdentityFile ./vm_private_key" root@$ip
+        spawn ssh-copy-id -i /home/azureagent/.ssh/$(clusternamevar).pub -o "IdentityFile /home/azureagent/.ssh/vm_private_key" root@$ip
         expect "Enter passphrase for"
         send "$passphrase\r"
         expect eof
@@ -81,7 +80,7 @@ stages:
           # ssh-copy-id -f -i ~/.ssh/$(clusternamevar).pub -o "IdentityFile ./vm_private_key" root@$ip
           ./ssh_copy_id.exp $(vmpassphrase) $ip
         done
-        rm vm_private_key
+        rm /home/azureagent/.ssh/vm_private_key
       displayName: 'Set up SSH access for all nodes'
     
     - script: |
