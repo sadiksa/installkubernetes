@@ -73,8 +73,21 @@ stages:
         set ip [lindex $argv 1]
 
         spawn ssh-copy-id -i /home/azureagent/.ssh/$(clusternamevar).pub -o "IdentityFile /home/azureagent/.ssh/vm_private_key" root@$ip
-        expect "Enter passphrase for"
-        send "$passphrase\r"
+        # expect "Enter passphrase for"
+        # send "$passphrase\r"
+        # expect eof
+        # EOF
+
+        expect {
+            "The authenticity of host" {
+                send "yes\r"
+                expect "Enter passphrase for"
+                send "$passphrase\r"
+            }
+            "Enter passphrase for" {
+                send "$passphrase\r"
+            }
+        }
         expect eof
         EOF
 
