@@ -90,7 +90,7 @@ stages:
         CONFIG_FILE=kubespray/inventory/$(clusternamevar)/hosts.yaml python3 kubespray/contrib/inventory_builder/inventory.py ${IPS[@]}
       displayName: 'Set up Kubespray inventory'
 
-    # - script: |
-    #     ansible-playbook -i kubespray/inventory/$(clusternamevar)/hosts.yaml --become --become-user=root kubespray/cluster.yml
-    #   displayName: 'Deploy Kubernetes with Kubespray'
+    - script: |
+        ansible-playbook -i kubespray/inventory/$(clusternamevar)/hosts.yaml --become --become-user=root kubespray/cluster.yml
+      displayName: 'Deploy Kubernetes with Kubespray'
 
