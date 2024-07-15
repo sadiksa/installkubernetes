@@ -132,6 +132,10 @@ stages:
       displayName: 'Set up Kubespray inventory'
 
     - script: |
+        ssh-add -l
+        echo '---'
+        source ~/.ssh/environment
+        ssh-add -l
         cd kubespray
         source venv/bin/activate
         ansible-playbook -i inventory/$(clusternamevar)/hosts.yaml --become --become-user=root cluster.yml
