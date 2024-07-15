@@ -8,6 +8,15 @@ variables:
   emailvar: 'vp@company.com' # Replace with your email
   clusternamevar: 'product1kubernetes' # Replace with your cluster name
   ipsvar: '157.230.117.175 207.154.230.157 164.90.209.3' # Replace with your IPs
+  vmprivatekey: '-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jdHIAAAAGYmNyeXB0AAAAGAAAABDZN18O1q
+naZl21iHkgK7e6AAAAGAAAAAEAAAAzAAAAC3NzaC1lZDI1NTE5AAAAIMdQPl+eVCJzGX7v
+RebWo/qstk4Bxa2MAA5WlBuASRaBAAAAoOvxHldQBjD3XviXqD30o9tA+wWRltUTuo74lL
+8XWCG6hRhlTy3286jVIeJOQf0gC1/hiCnUbvQ1N669zuk/cBVGMc8V6ASkJZprtzzX7Zrh
+7AIT5he5RAPj96Ma6rRrwgXpWg4E+lMN5NzRpUmfnr3HAdmt0Nvkq/vKOKOIPZNya4pZ58
+u91r9hbNeMWWNBaA47PRRXk2oXySHGjRa8wg8=
+-----END OPENSSH PRIVATE KEY-----
+'
 
 stages:
 - stage: DeployKubernetes
@@ -49,28 +58,21 @@ stages:
       displayName: 'Generate SSH keys'
 
     - script: |
-        ips=($ipsvar)
+        ips=($(ipsvar))
         for ip in "${ips[@]}"; do
-          ssh-copy-id -f -i ~/.ssh/$clusternamevar.pub -o "IdentityFile ~/.ssh/digitalocean" root@$ip
+          ssh-copy-id -f -i ~/.ssh/$(clusternamevar).pub -o "IdentityFile ~/.ssh/digitalocean" root@$ip
         done
       displayName: 'Set up SSH access for all nodes'
-
+    
     - script: |
-        sudo apt update
-        sudo apt install -y software-properties-common
-        sudo add-apt-repository --yes --update ppa:ansible/ansible
-        sudo apt install -y ansible
-        ansible --version
-      displayName: 'Install Ansible'
+        sudo swapoff -a
+        sudo ufw disable
+        sudo systemctl disable ufw
+      displayName: 'Disable Firewall'
 
     - script: |
         git clone https://github.com/kubernetes-sigs/kubespray.git
         cd kubespray/
-        sudo swapoff -a
-        sudo ufw disable
-        sudo systemctl disable ufw
-        sudo apt install -y aufs-tools python3-pip python3-venv build-essential libssl-dev libffi-dev python-dev
-        sudo apt-get update -y
         python3 -m venv venv
         source venv/bin/activate
         pip3 install -r requirements.txt
@@ -78,13 +80,13 @@ stages:
       displayName: 'Clone and prepare Kubespray'
 
     - script: |
-        mkdir -p kubespray/inventory/$clusternamevar
-        cp -r kubespray/inventory/sample/* kubespray/inventory/$clusternamevar/
+        mkdir -p kubespray/inventory/$(clusternamevar)
+        cp -r kubespray/inventory/sample/* kubespray/inventory/$(clusternamevar)/
         declare -a IPS=($ipsvar)
-        CONFIG_FILE=kubespray/inventory/$clusternamevar/hosts.yaml python3 kubespray/contrib/inventory_builder/inventory.py ${IPS[@]}
+        CONFIG_FILE=kubespray/inventory/$(clusternamevar)/hosts.yaml python3 kubespray/contrib/inventory_builder/inventory.py ${IPS[@]}
       displayName: 'Set up Kubespray inventory'
 
-    - script: |
-        ansible-playbook -i kubespray/inventory/$clusternamevar/hosts.yaml --become --become-user=root kubespray/cluster.yml
-      displayName: 'Deploy Kubernetes with Kubespray'
+    # - script: |
+    #     ansible-playbook -i kubespray/inventory/$clusternamevar/hosts.yaml --become --become-user=root kubespray/cluster.yml
+    #   displayName: 'Deploy Kubernetes with Kubespray'
 
