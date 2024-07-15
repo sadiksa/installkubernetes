@@ -87,7 +87,9 @@ stages:
         cp -r kubespray/inventory/sample/* kubespray/inventory/$(clusternamevar)/
         source kubespray/venv/bin/activate
         declare -a IPS=($ipsvar)
+        ls kubespray/inventory/$(clusternamevar)
         CONFIG_FILE=kubespray/inventory/$(clusternamevar)/hosts.yaml python3 kubespray/contrib/inventory_builder/inventory.py ${IPS[@]}
+        ls kubespray/inventory/$(clusternamevar)
       displayName: 'Set up Kubespray inventory'
 
     - script: |
