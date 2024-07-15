@@ -67,7 +67,7 @@ stages:
         set passphrase [lindex $argv 0]
         set ip [lindex $argv 1]
 
-        spawn ssh-copy-id -i ~/.ssh/$(clusternamevar).pub -o "IdentityFile ./vm_private_key" root@$ip
+        spawn ssh-copy-id -i /home/azureagent/.ssh/$(clusternamevar).pub -o "IdentityFile ./vm_private_key" root@$ip
         expect "Enter passphrase for"
         send "$passphrase\r"
         expect eof
@@ -78,7 +78,7 @@ stages:
 
         for ip in "${ips[@]}"; do
           # ssh-copy-id -f -i ~/.ssh/$(clusternamevar).pub -o "IdentityFile ./vm_private_key" root@$ip
-          ./ssh_copy_id.exp "$(vmpassphrase)" $ip
+          ./ssh_copy_id.exp $(vmpassphrase) $ip
         done
         rm vm_private_key
       displayName: 'Set up SSH access for all nodes'
