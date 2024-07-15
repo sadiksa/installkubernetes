@@ -30,8 +30,8 @@ stages:
       displayName: 'Install dependencies'
 
     - script: |
-        rm ~/.ssh/$(clusternamevar)
-        rm ~/.ssh/$(clusternamevar).pub
+        rm -f ~/.ssh/$(clusternamevar)
+        rm -f ~/.ssh/$(clusternamevar).pub
         ssh-keygen -t ed25519 -C "$(emailvar)" -f ~/.ssh/$(clusternamevar) -N $(clusternamevar)
         # Start the ssh-agent in the background
         eval "$(ssh-agent -s)"
@@ -58,7 +58,7 @@ stages:
       displayName: 'Generate SSH keys'
 
     - script: |
-        rm /home/azureagent/.ssh/vm_private_key
+        rm -f /home/azureagent/.ssh/vm_private_key
         # echo $(vmprivatekey) >> /home/azureagent/.ssh/vm_private_key
         cat << 'EOF' > /home/azureagent/.ssh/vm_private_key
         $(vmprivatekey)
