@@ -5,14 +5,16 @@ variables:
   emailvar: 'vp@company.com' # Replace with your email
   clusternamevar: 'product1kubernetes' # Replace with your cluster name
   ipsvar: '157.230.117.175 207.154.230.157 164.90.209.3' # Replace with your IPs
-  vmprivatekey: '-----BEGIN OPENSSH PRIVATE KEY-----
+  vmprivatekey: '
+  -----BEGIN OPENSSH PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jdHIAAAAGYmNyeXB0AAAAGAAAABDZN18O1q
 naZl21iHkgK7e6AAAAGAAAAAEAAAAzAAAAC3NzaC1lZDI1NTE5AAAAIMdQPl+eVCJzGX7v
 RebWo/qstk4Bxa2MAA5WlBuASRaBAAAAoOvxHldQBjD3XviXqD30o9tA+wWRltUTuo74lL
 8XWCG6hRhlTy3286jVIeJOQf0gC1/hiCnUbvQ1N669zuk/cBVGMc8V6ASkJZprtzzX7Zrh
 7AIT5he5RAPj96Ma6rRrwgXpWg4E+lMN5NzRpUmfnr3HAdmt0Nvkq/vKOKOIPZNya4pZ58
 u91r9hbNeMWWNBaA47PRRXk2oXySHGjRa8wg8=
------END OPENSSH PRIVATE KEY-----'
+-----END OPENSSH PRIVATE KEY-----
+'
   vmpassphrase: 'digitalocean'
 
 stages:
