@@ -71,6 +71,11 @@ stages:
         # It is required that your private key files are NOT accessible by others.
         ips=($(ipsvar))
 
+        eval "$(ssh-agent -s)"
+        echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> ~/.ssh/environment
+        echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> ~/.ssh/environment
+        source ~/.ssh/environment
+        
         # Create the expect script
         cat << 'EOF' > add_ssh_key.exp
         #!/usr/bin/expect -f
