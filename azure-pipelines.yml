@@ -4,7 +4,7 @@ pool:
 variables:
   emailvar: 'vp@company.com' # Replace with your email
   clusternamevar: 'product1kubernetes' # Replace with your cluster name
-  ipsvar: '157.230.117.175 207.154.230.157 164.90.209.3' # Replace with your IPs
+  ipsvar: '164.92.167.232 164.92.253.150' # Replace with your IPs
   vmprivatekey: |
     -----BEGIN OPENSSH PRIVATE KEY-----
     b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jdHIAAAAGYmNyeXB0AAAAGAAAABDZN18O1q
