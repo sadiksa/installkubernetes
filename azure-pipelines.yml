@@ -2,9 +2,8 @@ pool:
   name: 'digitalocean'
 
 variables:
-  emailvar: 'vp@company.com' # Replace with your email
   clusternamevar: 'product1kubernetes' # Replace with your cluster name
-  ipsvar: '164.92.167.232 164.92.253.150' # Replace with your IPs
+  ipsvar: '157.230.121.63 138.68.100.202' # Replace with your IPs
   vmprivatekey: |
     -----BEGIN OPENSSH PRIVATE KEY-----
     b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jdHIAAAAGYmNyeXB0AAAAGAAAABDZN18O1q
@@ -28,38 +27,6 @@ stages:
         sudo apt install -y ansible git python3-pip python3-venv
         sudo apt install expect
       displayName: 'Install dependencies'
-
-    # - script: |
-    #     rm -f ~/.ssh/$(clusternamevar)
-    #     rm -f ~/.ssh/$(clusternamevar).pub
-    #     ssh-keygen -t ed25519 -C "$(emailvar)" -f ~/.ssh/$(clusternamevar) -N $(clusternamevar)
-    #     # Start the ssh-agent in the background
-    #     eval "$(ssh-agent -s)"
-    #     echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> ~/.ssh/environment
-    #     echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> ~/.ssh/environment
-    #     source ~/.ssh/environment
-    #     # Create the expect script
-    #     cat << 'EOF' > add_ssh_key.exp
-    #     #!/usr/bin/expect -f
-    #     set timeout -1
-    #     set key_path [lindex $argv 0]
-    #     set passphrase [lindex $argv 1]
-    #     spawn ssh-add $key_path
-    #     expect "Enter passphrase for"
-    #     send "$passphrase\r"
-    #     expect eof
-    #     EOF
-
-    #     # Make the script executable
-    #     chmod +x add_ssh_key.exp
-
-    #     # Run the expect script with the SSH key and passphrase
-    #     ./add_ssh_key.exp ~/.ssh/$(clusternamevar) "$(clusternamevar)"
-
-    #     # Clean up the expect script
-    #     rm add_ssh_key.exp
-    #     ssh-add -l
-    #   displayName: 'Generate SSH keys'
 
     - script: |
         sudo rm -f /home/azureagent/.ssh/vm_private_key
@@ -94,43 +61,6 @@ stages:
 
         # Run the expect script with the SSH key and passphrase
         ./add_ssh_key.exp /home/azureagent/.ssh/vm_private_key "$(vmpassphrase)"
-        ls -al /home/azureagent/.ssh
-        echo '---'
-        sudo ls -al /root/.ssh
-
-        # cat << 'EOF' > ssh_copy_id.exp
-        # #!/usr/bin/expect -f
-        # set timeout -1
-        # set passphrase [lindex $argv 0]
-        # set ip [lindex $argv 1]
-
-        # spawn ssh-copy-id -f -i /home/azureagent/.ssh/$(clusternamevar).pub -o "IdentityFile /home/azureagent/.ssh/vm_private_key" root@$ip
-        # # expect "Enter passphrase for"
-        # # send "$passphrase\r"
-        # # expect eof
-        # # EOF
-
-        # expect {
-        #     "The authenticity of host" {
-        #         send "yes\r"
-        #         expect "Enter passphrase for"
-        #         send "$passphrase\r"
-        #     }
-        #     "Enter passphrase for" {
-        #         send "$passphrase\r"
-        #     }
-        # }
-        # expect eof
-        # EOF
-
-        # chmod +x ssh_copy_id.exp
-
-
-        # for ip in "${ips[@]}"; do
-        #   # ssh-copy-id -f -i ~/.ssh/$(clusternamevar).pub -o "IdentityFile ./vm_private_key" root@$ip
-        #   ./ssh_copy_id.exp $(vmpassphrase) $ip
-        # done
-        # rm /home/azureagent/.ssh/vm_private_key
       displayName: 'Set up SSH access for all nodes'
     
     - script: |
@@ -153,18 +83,10 @@ stages:
         cp -r kubespray/inventory/sample/* kubespray/inventory/$(clusternamevar)/
         source kubespray/venv/bin/activate
         declare -a IPS=($(ipsvar))
-        ls kubespray/inventory/$(clusternamevar)
         CONFIG_FILE=kubespray/inventory/$(clusternamevar)/hosts.yaml python3 kubespray/contrib/inventory_builder/inventory.py ${IPS[@]}
-        ls kubespray/inventory/$(clusternamevar)
       displayName: 'Set up Kubespray inventory'
 
     - script: |
-        ssh-add -l
-        echo '---'
-        ssh-add -l
-        ls -al /home/azureagent/.ssh
-        echo '---'
-        sudo ls -al /root/.ssh
         cd kubespray
         source venv/bin/activate
         export ANSIBLE_HOST_KEY_CHECKING=False
