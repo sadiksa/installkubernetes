@@ -94,6 +94,9 @@ stages:
 
         # Run the expect script with the SSH key and passphrase
         ./add_ssh_key.exp /home/azureagent/.ssh/vm_private_key "$(vmpassphrase)"
+        ls -al /home/azureagent/.ssh
+        echo '---'
+        ls -al /root/.ssh
 
         # cat << 'EOF' > ssh_copy_id.exp
         # #!/usr/bin/expect -f
@@ -160,6 +163,9 @@ stages:
         echo '---'
         source ~/.ssh/environment
         ssh-add -l
+        ls -al /home/azureagent/.ssh
+        echo '---'
+        ls -al /root/.ssh
         cd kubespray
         source venv/bin/activate
         ansible-playbook -i inventory/$(clusternamevar)/hosts.yaml -u root --private-key=/home/azureagent/.ssh/vm_private_key --become --become-user=root cluster.yml
