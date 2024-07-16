@@ -29,15 +29,48 @@ stages:
         sudo apt install expect
       displayName: 'Install dependencies'
 
+    # - script: |
+    #     rm -f ~/.ssh/$(clusternamevar)
+    #     rm -f ~/.ssh/$(clusternamevar).pub
+    #     ssh-keygen -t ed25519 -C "$(emailvar)" -f ~/.ssh/$(clusternamevar) -N $(clusternamevar)
+    #     # Start the ssh-agent in the background
+    #     eval "$(ssh-agent -s)"
+    #     echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> ~/.ssh/environment
+    #     echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> ~/.ssh/environment
+    #     source ~/.ssh/environment
+    #     # Create the expect script
+    #     cat << 'EOF' > add_ssh_key.exp
+    #     #!/usr/bin/expect -f
+    #     set timeout -1
+    #     set key_path [lindex $argv 0]
+    #     set passphrase [lindex $argv 1]
+    #     spawn ssh-add $key_path
+    #     expect "Enter passphrase for"
+    #     send "$passphrase\r"
+    #     expect eof
+    #     EOF
+
+    #     # Make the script executable
+    #     chmod +x add_ssh_key.exp
+
+    #     # Run the expect script with the SSH key and passphrase
+    #     ./add_ssh_key.exp ~/.ssh/$(clusternamevar) "$(clusternamevar)"
+
+    #     # Clean up the expect script
+    #     rm add_ssh_key.exp
+    #     ssh-add -l
+    #   displayName: 'Generate SSH keys'
+
     - script: |
-        rm -f ~/.ssh/$(clusternamevar)
-        rm -f ~/.ssh/$(clusternamevar).pub
-        ssh-keygen -t ed25519 -C "$(emailvar)" -f ~/.ssh/$(clusternamevar) -N $(clusternamevar)
-        # Start the ssh-agent in the background
-        eval "$(ssh-agent -s)"
-        echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> ~/.ssh/environment
-        echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> ~/.ssh/environment
-        source ~/.ssh/environment
+        rm -f /home/azureagent/.ssh/vm_private_key
+        # echo $(vmprivatekey) >> /home/azureagent/.ssh/vm_private_key
+        cat << 'EOF' > /home/azureagent/.ssh/vm_private_key
+        $(vmprivatekey)
+        EOF
+        chmod 600 /home/azureagent/.ssh/vm_private_key
+        # It is required that your private key files are NOT accessible by others.
+        ips=($(ipsvar))
+
         # Create the expect script
         cat << 'EOF' > add_ssh_key.exp
         #!/usr/bin/expect -f
@@ -54,56 +87,41 @@ stages:
         chmod +x add_ssh_key.exp
 
         # Run the expect script with the SSH key and passphrase
-        ./add_ssh_key.exp ~/.ssh/$(clusternamevar) "$(clusternamevar)"
+        ./add_ssh_key.exp /home/azureagent/.ssh/vm_private_key "$(vmpassphrase)"
 
-        # Clean up the expect script
-        rm add_ssh_key.exp
-        ssh-add -l
-      displayName: 'Generate SSH keys'
+        # cat << 'EOF' > ssh_copy_id.exp
+        # #!/usr/bin/expect -f
+        # set timeout -1
+        # set passphrase [lindex $argv 0]
+        # set ip [lindex $argv 1]
 
-    - script: |
-        rm -f /home/azureagent/.ssh/vm_private_key
-        # echo $(vmprivatekey) >> /home/azureagent/.ssh/vm_private_key
-        cat << 'EOF' > /home/azureagent/.ssh/vm_private_key
-        $(vmprivatekey)
-        EOF
-        chmod 600 /home/azureagent/.ssh/vm_private_key
-        # It is required that your private key files are NOT accessible by others.
-        ips=($(ipsvar))
+        # spawn ssh-copy-id -f -i /home/azureagent/.ssh/$(clusternamevar).pub -o "IdentityFile /home/azureagent/.ssh/vm_private_key" root@$ip
+        # # expect "Enter passphrase for"
+        # # send "$passphrase\r"
+        # # expect eof
+        # # EOF
 
-        cat << 'EOF' > ssh_copy_id.exp
-        #!/usr/bin/expect -f
-        set timeout -1
-        set passphrase [lindex $argv 0]
-        set ip [lindex $argv 1]
-
-        spawn ssh-copy-id -f -i /home/azureagent/.ssh/$(clusternamevar).pub -o "IdentityFile /home/azureagent/.ssh/vm_private_key" root@$ip
-        # expect "Enter passphrase for"
-        # send "$passphrase\r"
+        # expect {
+        #     "The authenticity of host" {
+        #         send "yes\r"
+        #         expect "Enter passphrase for"
+        #         send "$passphrase\r"
+        #     }
+        #     "Enter passphrase for" {
+        #         send "$passphrase\r"
+        #     }
+        # }
         # expect eof
         # EOF
 
-        expect {
-            "The authenticity of host" {
-                send "yes\r"
-                expect "Enter passphrase for"
-                send "$passphrase\r"
-            }
-            "Enter passphrase for" {
-                send "$passphrase\r"
-            }
-        }
-        expect eof
-        EOF
-
-        chmod +x ssh_copy_id.exp
+        # chmod +x ssh_copy_id.exp
 
 
-        for ip in "${ips[@]}"; do
-          # ssh-copy-id -f -i ~/.ssh/$(clusternamevar).pub -o "IdentityFile ./vm_private_key" root@$ip
-          ./ssh_copy_id.exp $(vmpassphrase) $ip
-        done
-        rm /home/azureagent/.ssh/vm_private_key
+        # for ip in "${ips[@]}"; do
+        #   # ssh-copy-id -f -i ~/.ssh/$(clusternamevar).pub -o "IdentityFile ./vm_private_key" root@$ip
+        #   ./ssh_copy_id.exp $(vmpassphrase) $ip
+        # done
+        # rm /home/azureagent/.ssh/vm_private_key
       displayName: 'Set up SSH access for all nodes'
     
     - script: |
@@ -138,6 +156,6 @@ stages:
         ssh-add -l
         cd kubespray
         source venv/bin/activate
-        ansible-playbook -i inventory/$(clusternamevar)/hosts.yaml --become --become-user=root cluster.yml
+        ansible-playbook -i inventory/$(clusternamevar)/hosts.yaml -u root --private-key=/home/azureagent/.ssh/vm_private_key --become --become-user=root cluster.yml
       displayName: 'Deploy Kubernetes with Kubespray'
 
