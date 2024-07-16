@@ -62,12 +62,13 @@ stages:
     #   displayName: 'Generate SSH keys'
 
     - script: |
-        rm -f /home/azureagent/.ssh/vm_private_key
+        sudo rm -f /home/azureagent/.ssh/vm_private_key
         # echo $(vmprivatekey) >> /home/azureagent/.ssh/vm_private_key
         cat << 'EOF' > /home/azureagent/.ssh/vm_private_key
         $(vmprivatekey)
         EOF
         chmod 600 /home/azureagent/.ssh/vm_private_key
+        chown root:root /home/azureagent/.ssh/vm_private_key
         # It is required that your private key files are NOT accessible by others.
         ips=($(ipsvar))
 
@@ -75,7 +76,7 @@ stages:
         echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> ~/.ssh/environment
         echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> ~/.ssh/environment
         source ~/.ssh/environment
-        
+
         # Create the expect script
         cat << 'EOF' > add_ssh_key.exp
         #!/usr/bin/expect -f
