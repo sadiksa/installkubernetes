@@ -168,6 +168,7 @@ stages:
         sudo ls -al /root/.ssh
         cd kubespray
         source venv/bin/activate
+        export ANSIBLE_HOST_KEY_CHECKING=False
         ansible-playbook -i inventory/$(clusternamevar)/hosts.yaml -u root --private-key=/home/azureagent/.ssh/vm_private_key --become --become-user=root cluster.yml
       displayName: 'Deploy Kubernetes with Kubespray'
 
