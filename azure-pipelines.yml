@@ -161,7 +161,6 @@ stages:
     - script: |
         ssh-add -l
         echo '---'
-        source ~/.ssh/environment
         ssh-add -l
         ls -al /home/azureagent/.ssh
         echo '---'
