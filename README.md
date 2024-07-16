@@ -1,10 +1,21 @@
+# Install K8s With Kubespray Pipeline
+The target of the pipeline is to automate the deployment of a Kubernetes cluster on target machines using Kubespray.
+
 # Table of Contents
+- Variables
 - Install Dependencies
 - Set up SSH Access for All Nodes
 - Disable Firewall
 - Clone and Prepare Kubespray
 - Set up Kubespray Inventory
 - Deploy Kubernetes with Kubespray
+
+# Variables
+The following variables need to be set in the pipeline YAML file:
+- clusternamevar: The name of your Kubernetes cluster. Replace 'product1kubernetes' with your cluster name.
+- ipsvar: The IP addresses of your nodes. Replace '157.230.121.63 138.68.100.202' with your IP addresses.
+- vmprivatekey: The private SSH key used to access your nodes. Replace the provided key with your private key.
+- vmpassphrase: The passphrase for your private SSH key. Replace 'digitalocean' with your passphrase.
 
 # Install Dependencies
 ```console
@@ -90,10 +101,3 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 ansible-playbook -i inventory/$(clusternamevar)/hosts.yaml -u root --private-key=/home/azureagent/.ssh/vm_private_key --become --become-user=root cluster.yml
 ```
 This final stage deploys Kubernetes using Kubespray with Ansible. It runs the playbook to set up the cluster using the specified inventory and SSH key.
-
-
-
-# 
-```console
-
-```
